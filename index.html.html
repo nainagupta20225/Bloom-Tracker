@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>🌸 My Bloom Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;overflow-x:hidden}
+body{background:#F0EAFF;font-family:'Nunito',sans-serif;font-size:17px;color:#2D1B69}
+:root{--p1:#7C3AED;--p2:#9B5CF6;--p3:#C4B5FD;--p4:#EDE9FE;--p5:#F3EEFF;--deep:#1E0A4A;--mid:#6D28D9;--soft:#8B5CF6;--border:#C4B5FD;--rose:#F43F8E;--pink:#F9A8D4;--sun:#FBBF24;--green:#4ADE80;--maxw:900px}
+.card{background:white;border-radius:20px;padding:22px 24px;border:1.5px solid var(--border);box-shadow:0 4px 20px rgba(124,58,237,0.09);margin-bottom:18px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:radial-gradient(circle,rgba(196,181,253,0.18),transparent 70%);border-radius:50%;pointer-events:none}
+.hero{background:linear-gradient(135deg,#5B21B6,#7C3AED,#A855F7,#C084FC);border-radius:22px;padding:28px 30px;color:white;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(124,58,237,0.38)}
+.navb{transition:all 0.2s;cursor:pointer;border:none;font-family:Nunito}
+.navb:hover{background:rgba(168,85,247,0.22)!important}
+.navb.act{background:rgba(168,85,247,0.25)!important;border:2px solid #A855F7!important;color:#5B21B6!important}
+.hcard{transition:all 0.32s cubic-bezier(.34,1.2,.64,1);cursor:pointer;border:2px solid var(--border)}
+.hcard:hover{transform:translateY(-6px) scale(1.04)!important;box-shadow:0 16px 36px rgba(124,58,237,0.2)!important}
+.hcard.done{background:linear-gradient(150deg,#F3EEFF,#EDE9FE)!important;border-color:#A855F7!important}
+.cday{transition:all 0.18s ease;cursor:pointer;border-radius:14px}
+.cday:hover{background:rgba(168,85,247,0.16)!important;transform:scale(1.07)}
+.icoBtn{transition:all 0.18s;cursor:pointer}
+.icoBtn:hover{transform:scale(1.18)}
+.icoBtn.sel{border-color:#A855F7!important;background:#EDE9FE!important}
+.del-btn:hover{background:#FFE4E4!important;color:#B91C1C!important}
+.addBtn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 10px 28px rgba(168,85,247,0.55)!important}
+.glass-pip{transition:all 0.22s cubic-bezier(.34,1.5,.64,1);cursor:pointer}
+.glass-pip:hover{transform:scale(1.15)}
+.seccard{transition:all 0.28s ease;cursor:pointer}
+.seccard:hover{transform:translateY(-5px);box-shadow:0 14px 34px rgba(124,58,237,0.2)!important}
+select,textarea,input{font-family:'Nunito',sans-serif;outline:none;transition:border 0.2s,box-shadow 0.2s}
+select:focus,textarea:focus,input:focus{border-color:#A855F7!important;box-shadow:0 0 0 3px rgba(168,85,247,0.18)!important}
+@keyframes bloomIn{from{transform:scale(0.78) translateY(14px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes sway{0%,100%{transform:rotate(-3deg) translateY(0)}50%{transform:rotate(3deg) translateY(-5px)}}
+@keyframes float1{0%,100%{transform:translateY(0) rotate(0deg)}40%{transform:translateY(-14px) rotate(4deg)}70%{transform:translateY(-8px) rotate(-3deg)}}
+@keyframes float2{0%,100%{transform:translateY(0) rotate(5deg)}50%{transform:translateY(-18px) rotate(-6deg)}}
+@keyframes float3{0%,100%{transform:translateY(0) rotate(-8deg)}60%{transform:translateY(-11px) rotate(5deg)}}
+@keyframes petalPop{from{transform:scale(0) rotate(-45deg);opacity:0}to{transform:scale(1) rotate(0deg);opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:0.6}50%{transform:scale(1.3);opacity:1}}
+@keyframes shimmer{0%{opacity:0.7}50%{opacity:1}100%{opacity:0.7}}
+.bloom{animation:bloomIn 0.5s cubic-bezier(.34,1.56,.64,1)}
+.fadeup{animation:fadeUp 0.45s ease both}
+.sway{animation:sway 4s ease-in-out infinite}
+.f1{animation:float1 6s ease-in-out infinite}
+.f2{animation:float2 7.5s ease-in-out infinite}
+.f3{animation:float3 5.5s ease-in-out infinite}
+.pulse{animation:pulse 2.2s ease-in-out infinite}
+.shim{animation:shimmer 3s ease-in-out infinite}
+::-webkit-scrollbar{width:7px}
+::-webkit-scrollbar-thumb{background:var(--p3);border-radius:4px}
+.bgflowers{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+/* ─── LAYOUT: centered, max-width constrained ─── */
+.site-shell{position:relative;z-index:1}
+.hdr-inner{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;gap:12;flex-wrap:wrap;width:100%}
+.wrap{position:relative;z-index:1;width:100%;max-width:var(--maxw);margin:0 auto;padding:0 16px 100px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px}
+/* ─── NAV scrolls horizontally on small screens ─── */
+.nav-scroll{display:flex;gap:4px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;flex:1;align-items:center}
+.nav-scroll::-webkit-scrollbar{display:none}
+/* ─── MOBILE ─── */
+@media(max-width:640px){
+  body{font-size:15px}
+  .card{padding:16px 15px;border-radius:16px;margin-bottom:14px}
+  .hero{padding:20px 18px;border-radius:18px}
+  .wrap{padding:0 12px 90px}
+  .grid3{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+  .grid2{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useCallback}=React;
+const LS={get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch{return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+
+/* ══════════════════════════════════════
+   FLOWER SVGs
+══════════════════════════════════════ */
+function SunflowerBig({size=120,animate=false}){
+  const petals=16;
+  return(
+    <svg width={size} height={size*1.35} viewBox="0 0 120 162" style={{overflow:'visible',display:'block'}} className={animate?'sway':''}>
+      {/* Glow */}
+      <circle cx="60" cy="58" r="38" fill="#FDE68A" opacity="0.18"/>
+      <circle cx="60" cy="58" r="48" fill="#FCD34D" opacity="0.08"/>
+      {/* Stem */}
+      <path d="M60 96 C58 118,62 138,60 158" stroke="#16A34A" strokeWidth="5" fill="none" strokeLinecap="round"/>
+      {/* Leaves */}
+      <path d="M60 128 Q40 116 36 102 Q50 108 60 128" fill="#22C55E" opacity="0.9"/>
+      <path d="M60 140 Q80 128 86 114 Q72 122 60 140" fill="#16A34A" opacity="0.85"/>
+      {/* Outer petals */}
+      {Array.from({length:petals}).map((_,i)=>{
+        const a=(i/petals)*360*(Math.PI/180);
+        const r=(i/petals)*360;
+        return<ellipse key={i} cx={60+Math.cos(a)*30} cy={58+Math.sin(a)*30} rx="9" ry="17"
+          transform={`rotate(${r},${60+Math.cos(a)*30},${58+Math.sin(a)*30})`}
+          fill={i%2===0?"#FBBF24":"#F59E0B"} opacity="0.95"/>;
+      })}
+      {/* Inner petals */}
+      {Array.from({length:12}).map((_,i)=>{
+        const a=((i/12)*360+15)*(Math.PI/180);
+        const r=(i/12)*360+15;
+        return<ellipse key={`ip${i}`} cx={60+Math.cos(a)*19} cy={58+Math.sin(a)*19} rx="6" ry="11"
+          transform={`rotate(${r},${60+Math.cos(a)*19},${58+Math.sin(a)*19})`}
+          fill="#FCD34D" opacity="0.8"/>;
+      })}
+      {/* Center */}
+      <circle cx="60" cy="58" r="16" fill="#92400E"/>
+      <circle cx="60" cy="58" r="11" fill="#78350F"/>
+      {[0,30,60,90,120,150,180,210,240,270,300,330].map((a,i)=>{const ar=a*Math.PI/180;return<circle key={i} cx={60+Math.cos(ar)*5.5} cy={58+Math.sin(ar)*5.5} r="1.8" fill="#FBBF24" opacity="0.7"/>;})};
+      <circle cx="60" cy="58" r="4" fill="#451A03" opacity="0.5"/>
+    </svg>
+  );
+}
+
+function RoseSVG({size=100,color='#F43F8E',petalColor='#FB7185',leafColor='#16A34A'}){
+  return(
+    <svg width={size} height={size*1.4} viewBox="0 0 100 140" style={{overflow:'visible',display:'block'}}>
+      {/* Stem */}
+      <path d="M50 88 C48 105,52 125,50 136" stroke={leafColor} strokeWidth="4" fill="none" strokeLinecap="round"/>
+      <path d="M50 116 Q34 106 30 94 Q43 100 50 116" fill={leafColor} opacity="0.9"/>
+      <path d="M50 126 Q66 116 70 104 Q58 112 50 126" fill="#15803D" opacity="0.85"/>
+      {/* Sepals */}
+      {[0,72,144,216,288].map((a,i)=>{const ar=(a-90)*Math.PI/180;return<ellipse key={i} cx={50+Math.cos(ar)*14} cy={76+Math.sin(ar)*8} rx="4" ry="10" transform={`rotate(${a-90},${50+Math.cos(ar)*14},${76+Math.sin(ar)*8})`} fill={leafColor} opacity="0.8"/>;})};
+      {/* Outer petals */}
+      {[0,60,120,180,240,300].map((a,i)=>{const ar=(a-90)*Math.PI/180;return<ellipse key={i} cx={50+Math.cos(ar)*22} cy={50+Math.sin(ar)*18} rx="12" ry="20" transform={`rotate(${a},${50+Math.cos(ar)*22},${50+Math.sin(ar)*18})`} fill={petalColor} opacity="0.9"/>;})};
+      {/* Mid petals */}
+      {[30,90,150,210,270,330].map((a,i)=>{const ar=(a-90)*Math.PI/180;return<ellipse key={i} cx={50+Math.cos(ar)*14} cy={50+Math.sin(ar)*12} rx="10" ry="16" transform={`rotate(${a+20},${50+Math.cos(ar)*14},${50+Math.sin(ar)*12})`} fill={color} opacity="0.93"/>;})};
+      {/* Inner petals */}
+      {[0,72,144,216,288].map((a,i)=>{const ar=(a-90)*Math.PI/180;return<ellipse key={i} cx={50+Math.cos(ar)*7} cy={50+Math.sin(ar)*7} rx="7" ry="12" transform={`rotate(${a},${50+Math.cos(ar)*7},${50+Math.sin(ar)*7})`} fill={color} opacity="0.97"/>;})};
+      {/* Center */}
+      <circle cx="50" cy="50" r="8" fill={color}/>
+      <circle cx="50" cy="50" r="4.5" fill="#C2185B" opacity="0.6"/>
+      <circle cx="50" cy="50" r="2" fill="#880E4F"/>
+    </svg>
+  );
+}
+
+function WhiteRoseSVG({size=100}){
+  return<RoseSVG size={size} color="#FDF4FF" petalColor="#FAF5FF" leafColor="#15803D"/>;
+}
+function PinkRoseSVG({size=100}){
+  return<RoseSVG size={size} color="#EC4899" petalColor="#F9A8D4" leafColor="#15803D"/>;
+}
+
+function TulipSVG({size=100,color='#C084FC',inner='#E879F9'}){
+  return(
+    <svg width={size} height={size*1.5} viewBox="0 0 80 120" style={{overflow:'visible',display:'block'}}>
+      {/* Stem */}
+      <path d="M40 78 C39 95,41 112,40 118" stroke="#15803D" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+      {/* Leaves */}
+      <path d="M40 98 Q22 88 18 74 Q32 82 40 98" fill="#22C55E" opacity="0.88"/>
+      <path d="M40 106 Q58 96 62 82 Q48 90 40 106" fill="#16A34A" opacity="0.85"/>
+      {/* Petals - 3 outer */}
+      <path d="M40 78 C28 66,22 50,24 36 C26 22,34 14,40 12 C46 14,54 22,56 36 C58 50,52 66,40 78Z" fill={color} opacity="0.92"/>
+      <path d="M40 76 C30 60,16 52,14 38 C12 26,20 16,28 18 C32 20,36 30,40 38 C36 30,28 22,28 38 C28 52,36 62,40 76Z" fill={inner} opacity="0.85" transform="rotate(-22 40 45)"/>
+      <path d="M40 76 C50 60,64 52,66 38 C68 26,60 16,52 18 C48 20,44 30,40 38 C44 30,52 22,52 38 C52 52,44 62,40 76Z" fill={inner} opacity="0.85" transform="rotate(22 40 45)"/>
+      {/* Center highlight */}
+      <path d="M40 74 C38 60,36 46,38 32 Q40 24,42 32 C44 46,42 60,40 74Z" fill="white" opacity="0.3"/>
+    </svg>
+  );
+}
+
+function LavenderSprig({size=60}){
+  return(
+    <svg width={size} height={size*1.7} viewBox="0 0 60 102" style={{overflow:'visible'}}>
+      <line x1="30" y1="100" x2="30" y2="18" stroke="#15803D" strokeWidth="2.5" strokeLinecap="round"/>
+      {[[30,14,0,'#A855F7'],[24,24,-18,'#9333EA'],[36,24,18,'#C084FC'],[22,36,-25,'#7C3AED'],[38,36,25,'#A855F7'],[26,48,-18,'#C084FC'],[34,48,18,'#9333EA'],[28,60,-12,'#A855F7'],[32,60,12,'#C084FC']].map(([x,y,r,c],i)=>(
+        <ellipse key={i} cx={x} cy={y} rx="5" ry="8" transform={`rotate(${r},${x},${y})`} fill={c} opacity="0.88"/>
+      ))}
+      <path d="M30 80 Q20 72 16 64 Q24 68 30 80" fill="#22C55E" opacity="0.8"/>
+      <path d="M30 88 Q40 80 44 72 Q36 76 30 88" fill="#16A34A" opacity="0.78"/>
+    </svg>
+  );
+}
+
+/* ══════════ SUNFLOWER GROWTH (habit) ══════════ */
+function Petal({cx,cy,angle,fill,scale=1}){
+  const r=(angle*Math.PI)/180,L=13*scale,W=5.2*scale,pr=((angle+90)*Math.PI)/180;
+  const t=[cx+Math.cos(r)*L,cy+Math.sin(r)*L];
+  const c1=[cx+Math.cos(r)*L*.25+Math.cos(pr)*W,cy+Math.sin(r)*L*.25+Math.sin(pr)*W];
+  const c2=[cx+Math.cos(r)*L*.75+Math.cos(pr)*W,cy+Math.sin(r)*L*.75+Math.sin(pr)*W];
+  const c3=[cx+Math.cos(r)*L*.75-Math.cos(pr)*W,cy+Math.sin(r)*L*.75-Math.sin(pr)*W];
+  const c4=[cx+Math.cos(r)*L*.25-Math.cos(pr)*W,cy+Math.sin(r)*L*.25-Math.sin(pr)*W];
+  const f=n=>n.toFixed(2);
+  return<path d={`M${f(cx)} ${f(cy)} C${f(c1[0])} ${f(c1[1])},${f(c2[0])} ${f(c2[1])},${f(t[0])} ${f(t[1])} C${f(c3[0])} ${f(c3[1])},${f(c4[0])} ${f(c4[1])},${f(cx)} ${f(cy)}`} fill={fill} opacity="0.94"/>;
+}
+function GrowingSunflower({growth=0,size=110,animate=false}){
+  const g=Math.max(0,Math.min(10,Math.round(growth)));
+  const gY=88,sL=g===0?0:Math.min(54,g*6),fy=gY-sL;
+  const nP=g<5?0:Math.min(12,Math.round((g-4)*2.6));
+  const full=nP>=12,bud=g>=3&&nP===0;
+  const lp=(s,f)=>{if(sL<10)return null;const lY=gY-sL*f,si=s==='L'?-1:1;return`M50 ${lY.toFixed(1)} Q${(50+si*17).toFixed(1)} ${(lY-11).toFixed(1)} ${(50+si*15).toFixed(1)} ${(lY-22).toFixed(1)} Q${(50+si*4).toFixed(1)} ${(lY-8).toFixed(1)} 50 ${lY.toFixed(1)}`;};
+  return(
+    <svg viewBox="0 0 100 100" width={size} height={size} style={{overflow:'visible',display:'block'}} className={animate&&full?'sway':''}>
+      {full&&<circle cx="50" cy={fy} r="26" fill="#C084FC" opacity="0.12"/>}
+      {full&&<circle cx="50" cy={fy} r="34" fill="#A855F7" opacity="0.07"/>}
+      <ellipse cx="50" cy="93" rx="22" ry="6" fill="#5B21B6" opacity="0.2"/>
+      {g===0&&<><ellipse cx="50" cy="89" rx="4.5" ry="3" fill="#9B5CF6" opacity="0.7"/><line x1="50" y1="86" x2="50" y2="82" stroke="#15803D" strokeWidth="2" strokeLinecap="round"/></>}
+      {g>=1&&<path d={`M50 ${gY} C49 ${(gY-sL*.38).toFixed(1)},50 ${(gY-sL*.72).toFixed(1)},50 ${(fy+7).toFixed(1)}`} stroke="#16A34A" strokeWidth="3.2" fill="none" strokeLinecap="round"/>}
+      {g>=2&&sL>10&&<path d={lp('L',.3)} fill="#22C55E" opacity="0.85"/>}
+      {g>=3&&sL>16&&<path d={lp('R',.48)} fill="#22C55E" opacity="0.85"/>}
+      {g>=4&&sL>22&&<path d={lp('L',.67)} fill="#4ADE80" opacity="0.8"/>}
+      {g>=6&&sL>30&&<path d={lp('R',.8)} fill="#4ADE80" opacity="0.78"/>}
+      {bud&&<><ellipse cx="50" cy={fy} rx="5.5" ry="9" fill="#7C3AED" opacity="0.8"/><ellipse cx="50" cy={fy-2} rx="4" ry="6" fill="#C084FC" opacity="0.9"/></>}
+      {nP>0&&<>
+        {Array.from({length:nP}).map((_,i)=><Petal key={i} cx={50} cy={fy} angle={(i/12)*360-90} fill="#C084FC" scale={0.95}/>)}
+        {full&&Array.from({length:12}).map((_,i)=><Petal key={`b${i}`} cx={50} cy={fy} angle={(i/12)*360-75} fill="#A855F7" scale={0.65}/>)}
+        <circle cx="50" cy={fy} r={full?10.5:7.5} fill="#4C1D95"/>
+        <circle cx="50" cy={fy} r={full?7.5:5.5} fill="#2E1065" opacity="0.6"/>
+        {full&&[0,45,90,135,180,225,270,315].map((a,i)=>{const ar=a*Math.PI/180;return<circle key={i} cx={50+Math.cos(ar)*3.8} cy={fy+Math.sin(ar)*3.8} r="1.4" fill="#DDD6FE" opacity="0.65"/>;})};
+      </>}
+    </svg>
+  );
+}
+
+/* ══════════ BIG BACKGROUND FLOWERS ══════════ */
+function BgFlowers(){
+  const items=[
+    {T:SunflowerBig,p:{size:160},s:{top:-18,left:-28},cls:'f1',op:0.22},
+    {T:PinkRoseSVG,p:{size:140},s:{top:-20,right:-30},cls:'f2',op:0.2},
+    {T:TulipSVG,p:{size:130,color:'#C084FC',inner:'#A855F7'},s:{bottom:80,left:-30},cls:'f3',op:0.19},
+    {T:WhiteRoseSVG,p:{size:130},s:{bottom:100,right:-25},cls:'f1',op:0.18},
+    {T:LavenderSprig,p:{size:70},s:{top:'28%',right:4},cls:'f2',op:0.28},
+    {T:LavenderSprig,p:{size:60},s:{top:'55%',left:6},cls:'f3',op:0.26},
+    {T:TulipSVG,p:{size:100,color:'#F9A8D4',inner:'#EC4899'},s:{top:'42%',right:-20},cls:'f1',op:0.18},
+    {T:SunflowerBig,p:{size:100},s:{bottom:240,left:'38%'},cls:'f3',op:0.12},
+    {T:PinkRoseSVG,p:{size:95},s:{top:'72%',left:0},cls:'f2',op:0.17},
+    {T:WhiteRoseSVG,p:{size:110},s:{top:'20%',left:-20},cls:'f1',op:0.15},
+    {T:TulipSVG,p:{size:85,color:'#E879F9',inner:'#F0ABFC'},s:{bottom:180,right:10},cls:'f3',op:0.2},
+    {T:LavenderSprig,p:{size:55},s:{top:'62%',right:2},cls:'f1',op:0.24},
+  ];
+  return(
+    <div className="bgflowers">
+      {items.map(({T,p,s,cls,op},i)=>(
+        <div key={i} style={{position:'absolute',opacity:op,...s}} className={cls}>
+          <T {...p}/>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ══════════ CONSTANTS ══════════ */
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DEFAULT_HABITS=[
+  {id:'h1',name:'Morning Exercise',emoji:'🏃',color:'#A855F7'},
+  {id:'h2',name:'Drink 8 Glasses',emoji:'💧',color:'#60A5FA'},
+  {id:'h3',name:'Read 30 Mins',emoji:'📚',color:'#C084FC'},
+  {id:'h4',name:'Meditate',emoji:'🧘',color:'#34D399'},
+  {id:'h5',name:'Gratitude Journal',emoji:'✍️',color:'#F472B6'},
+];
+const ICONS=['🌸','🌻','🌹','🌷','🏃','💧','📚','🧘','✍️','🌙','🍎','💪','🎯','🎨','🎵','🌿','☀️','🌊','🧴','🥗','💊','🛌','🚶','🧠','🦋','⭐','🎀','💎','🔮','🍵','🎻','🎸','📖','🏆','🌺','🌼','💐','🪷','🫧',
+'🧁','🍓','🫐','🍇','🍑','🥑','🥦','🌽','🍜','🍣','🧇','🥞','🥤','🧃','☕','🍶','🧋','🍰','🫖','🧆',
+'🏋️','🤸','🏊','🚴','🥊','🎽','👟','🏄','🧘‍♀️','🤽','🏇','⛷️','🤾','🧗','🥋','🎯','⛳','🏹',
+'🌴','🌵','🍀','🌱','🪴','🌾','🍃','🍂','🍁','🌲','🌳','🪸','🐚','🪨',
+'✨','💫','🌟','⚡','🔥','❄️','🌈','🎆','🌛','🌝','⛅','🌤','🌦','🌀',
+'💌','📔','🗒️','📝','📓','📒','📕','📗','📘','📙','🗃️','📋','📌','🗂️',
+'💡','🔑','🪄','🎭','🎪','🎠','🎡','🎲','🎮','🕹️','🃏','🎬','📷','🎤',
+'🐱','🐶','🦊','🐻','🐼','🐨','🦁','🦄','🐝','🐢','🦩','🦚','🦜','🐠',
+'🌍','🗺️','🏔️','🏕️','🏖️','🌅','🌄','🌃','🏙️','🌉','🗼','🏛️','⛩️','🎑',
+'💆','💇','🛁','🪥','💅','💄','🧖','🤲','🙏','🫶','❤️','🩷','💜','💙','💚','🩵','🤍','🖤','🩶','🧡'];
+const COLORS=['#A855F7','#7C3AED','#EC4899','#F43F8E','#F59E0B','#34D399','#60A5FA','#818CF8','#C084FC','#F472B6','#FB923C','#38BDF8'];
+const SEC_COLORS=['#7C3AED','#EC4899','#059669','#2563EB','#D97706','#9333EA','#0891B2','#DC2626'];
+
+/* ══════════ HELPERS ══════════ */
+function dStr(d){if(!(d instanceof Date))return d;const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${dd}`;}
+function todayStr(){return dStr(new Date());}
+function getStreak(hId,comp){let s=0,d=new Date();if(!comp[todayStr()]?.[hId])d.setDate(d.getDate()-1);for(let i=0;i<730;i++){if(comp[dStr(d)]?.[hId]){s++;d.setDate(d.getDate()-1);}else break;}return s;}
+function fmtDate(d){const nd=new Date(d+'T12:00:00');return`${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][nd.getDay()]}, ${MONTHS[nd.getMonth()]} ${nd.getDate()}, ${nd.getFullYear()}`;}
+function getLast7(){return Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return dStr(d);});}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+
+/* ══════════ SHARED COMPONENTS ══════════ */
+function SCard({children,style={}}){return<div className="card" style={style}>{children}</div>;}
+function STitle({children,icon='',sub='',style={}}){
+  return(
+    <div style={{marginBottom:18,...style}}>
+      <div style={{fontFamily:'Playfair Display',fontSize:24,fontWeight:700,color:'#1E0A4A',display:'flex',alignItems:'center',gap:10}}>
+        {icon&&<span style={{fontSize:26}}>{icon}</span>}{children}
+      </div>
+      {sub&&<div style={{fontSize:14,color:'#8B5CF6',marginTop:4,fontWeight:600}}>{sub}</div>}
+    </div>
+  );
+}
+
+function BarChart({data,labels,color='#A855F7',unit='',maxVal,height=140}){
+  const W=560,H=height,pad=32,bW=Math.min(42,(W-pad*2)/data.length*.68);
+  const mx=maxVal||Math.max(...data,1);
+  const bx=(i)=>pad+(i*(W-pad*2-bW))/(data.length-1||1);
+  return(
+    <svg viewBox={`0 0 ${W} ${H+38}`} style={{width:'100%'}}>
+      {[0,.25,.5,.75,1].map((f,i)=>(
+        <g key={i}>
+          <line x1={pad} y1={H*f+6} x2={W-8} y2={H*f+6} stroke="#EDE9FE" strokeWidth="1.2"/>
+          <text x={pad-4} y={H*f+10} textAnchor="end" fontSize="10" fill="#8B5CF6">{Math.round(mx*(1-f))}{unit}</text>
+        </g>
+      ))}
+      {data.map((v,i)=>{
+        const bh=(v/mx)*H,by=H-bh+6,x=bx(i);
+        return(
+          <g key={i}>
+            <rect x={x} y={by} width={bW} height={bh} rx="8" fill={`url(#bc${i})`}/>
+            <defs><linearGradient id={`bc${i}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity="1"/>
+              <stop offset="100%" stopColor={color} stopOpacity="0.38"/>
+            </linearGradient></defs>
+            {v>0&&<text x={x+bW/2} y={by-5} textAnchor="middle" fontSize="11" fill="#4C1D95" fontWeight="800">{v}{unit}</text>}
+            <text x={x+bW/2} y={H+24} textAnchor="middle" fontSize="12" fill="#7C3AED" fontWeight="700">{labels[i]}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function MiniFlower({type='sunflower',size=36}){
+  if(type==='rose')return<PinkRoseSVG size={size}/>;
+  if(type==='white-rose')return<WhiteRoseSVG size={size}/>;
+  if(type==='tulip')return<TulipSVG size={size}/>;
+  if(type==='lavender')return<LavenderSprig size={size*.7}/>;
+  return<SunflowerBig size={size} animate={false}/>;
+}
+
+/* ══════════════════════════════════════
+   TODAY PAGE
+══════════════════════════════════════ */
+function TodayPage({habits,completions,toggleHabit}){
+  const td=todayStr(),now=new Date();
+  const done=habits.filter(h=>completions[td]?.[h.id]).length;
+  const pct=habits.length?Math.round(done/habits.length*100):0;
+  const hr=now.getHours();
+  const greet=hr<12?'Good morning, sunshine ☀️':hr<17?'Good afternoon, lovely 🌸':hr<21?'Good evening, star 🌙':'Good night, beautiful 🌟';
+  const weekStart=new Date(now);weekStart.setDate(now.getDate()-now.getDay());
+  const weekDays=Array.from({length:7},(_,i)=>{const d=new Date(weekStart);d.setDate(weekStart.getDate()+i);return dStr(d);});
+
+  return(
+    <div className="fadeup">
+      {/* Hero */}
+      <div className="hero">
+        <div style={{position:'absolute',top:-25,right:-25,opacity:0.28}} className="f2"><SunflowerBig size={160}/></div>
+        <div style={{position:'absolute',bottom:-30,left:-20,opacity:0.22}} className="f3"><PinkRoseSVG size={140}/></div>
+        <div style={{position:'absolute',top:10,left:-10,opacity:0.2}} className="f1"><TulipSVG size={100} color="#DDD6FE" inner="white"/></div>
+        <div style={{position:'relative',zIndex:1}}>
+          <div style={{fontFamily:'Playfair Display',fontSize:16,letterSpacing:'0.12em',opacity:0.85,marginBottom:8,textTransform:'uppercase',fontStyle:'italic'}}>{greet}</div>
+          <div style={{fontFamily:'Playfair Display',fontSize:32,fontWeight:700,lineHeight:1.2,marginBottom:10}}>{fmtDate(td)}</div>
+          <div style={{fontSize:19,opacity:0.92,marginBottom:20,fontWeight:600}}>
+            {done===0?'Plant your seeds today 🌱':done===habits.length?'🌸 All flowers in full bloom — magnificent!!':
+             `${done} of ${habits.length} flowers blooming beautifully`}
+          </div>
+          <div style={{width:'88%',height:14,background:'rgba(255,255,255,0.22)',borderRadius:7,marginBottom:8,overflow:'hidden'}}>
+            <div style={{width:`${pct}%`,height:'100%',background:'linear-gradient(to right,#FDE68A,#FCD34D,#FBBF24)',borderRadius:7,transition:'width 0.8s cubic-bezier(.34,1.2,.64,1)'}}/>
+          </div>
+          <div style={{fontSize:17,opacity:0.92,fontWeight:800}}>{pct}% blooming today ✨</div>
+        </div>
+      </div>
+
+      {/* Habit cards */}
+      <div className="grid3" style={{marginBottom:26}}>
+        {habits.length===0&&(
+          <div style={{gridColumn:'1/-1',textAlign:'center',padding:'50px 24px',color:'#8B5CF6',background:'white',borderRadius:26,border:'2.5px dashed #DDD6FE',fontSize:17,fontStyle:'italic',fontWeight:600}}>
+            <div style={{marginBottom:14}}><PinkRoseSVG size={70}/></div>
+            Head to ⚙️ Manage to plant your first habit 🌱
+          </div>
+        )}
+        {habits.map(h=>{
+          const isDone=!!(completions[td]?.[h.id]);
+          const s=getStreak(h.id,completions);
+          return(
+            <div key={h.id} className={`hcard${isDone?' done':''}`}
+              onClick={()=>toggleHabit(h.id,td)}
+              style={{background:'white',borderRadius:26,padding:'22px 18px 20px',textAlign:'center',boxShadow:'0 4px 14px rgba(124,58,237,0.09)',position:'relative',userSelect:'none'}}>
+              {isDone&&<div className="pulse" style={{position:'absolute',top:12,right:14,fontSize:20}}>✨</div>}
+              <div style={{margin:'0 auto 10px',width:100,height:100,display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
+                <GrowingSunflower growth={Math.min(10,s)} size={100} animate={isDone}/>
+              </div>
+              <div style={{fontSize:30,marginBottom:7}}>{h.emoji}</div>
+              <div style={{fontWeight:900,fontSize:16,color:'#1E0A4A',lineHeight:1.3,marginBottom:7,minHeight:40,display:'flex',alignItems:'center',justifyContent:'center'}}>{h.name}</div>
+              <div style={{fontSize:14,color:'#8B5CF6',marginBottom:12,fontWeight:800,display:'flex',alignItems:'center',justifyContent:'center',gap:5}}>
+                🔥 <span style={{color:'#5B21B6'}}>{s}</span> day streak
+              </div>
+              <div style={{width:38,height:38,borderRadius:'50%',margin:'0 auto',border:isDone?'none':'2.5px solid #DDD6FE',background:isDone?'linear-gradient(135deg,#A855F7,#7C3AED)':'transparent',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,color:'white',boxShadow:isDone?'0 4px 14px rgba(168,85,247,0.55)':'none',transition:'all 0.3s',fontWeight:900}}>
+                {isDone?'✓':''}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Weekly mini-tracker */}
+      {habits.length>0&&(
+        <SCard>
+          <STitle icon="🗓" sub="Click any cell to toggle a habit on past days">This Week's Garden</STitle>
+          <div style={{overflowX:'auto'}}>
+            <div style={{minWidth:460}}>
+              <div style={{display:'flex',gap:5,marginBottom:10}}>
+                <div style={{width:160,flexShrink:0}}/>
+                {weekDays.map((d,i)=>(
+                  <div key={i} style={{flex:1,textAlign:'center',fontSize:13,fontWeight:900,color:d===td?'#7C3AED':'#9B5CF6',letterSpacing:'0.04em',minWidth:36}}>
+                    {['Su','M','Tu','W','Th','F','Sa'][i]}
+                  </div>
+                ))}
+              </div>
+              {habits.map(h=>(
+                <div key={h.id} style={{display:'flex',alignItems:'center',gap:5,marginBottom:9}}>
+                  <div style={{width:160,flexShrink:0,display:'flex',alignItems:'center',gap:8,fontSize:16,fontWeight:800,color:'#1E0A4A'}}>
+                    <span style={{fontSize:22}}>{h.emoji}</span>{h.name.split(' ')[0]}
+                  </div>
+                  {weekDays.map((d,i)=>(
+                    <div key={i} style={{flex:1,height:30,borderRadius:9,background:completions[d]?.[h.id]?'linear-gradient(135deg,#A855F7,#7C3AED)':'#F3EEFF',border:`1.5px solid ${completions[d]?.[h.id]?'#7C3AED':'#DDD6FE'}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,color:completions[d]?.[h.id]?'white':'#C4B5FD',cursor:'pointer',transition:'all 0.2s',fontWeight:900,minWidth:36}}
+                      onClick={()=>toggleHabit(h.id,d)}>
+                      {completions[d]?.[h.id]?'✓':''}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </SCard>
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════
+   CALENDAR PAGE
+══════════════════════════════════════ */
+function CalendarPage({calNotes,setCalNotes,completions,toggleHabit,habits}){
+  const [year,setYear]=useState(()=>Math.max(2026,Math.min(new Date().getFullYear(),2045)));
+  const [month,setMonth]=useState(new Date().getMonth());
+  const [sel,setSel]=useState(null);
+  const [noteText,setNoteText]=useState('');
+  const dim=new Date(year,month+1,0).getDate(),fdow=new Date(year,month,1).getDay();
+  const ds=(d)=>`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const prevM=()=>{if(month===0){setMonth(11);setYear(y=>Math.max(2026,y-1));}else setMonth(m=>m-1);};
+  const nextM=()=>{if(month===11){setMonth(0);setYear(y=>Math.min(2045,y+1));}else setMonth(m=>m+1);};
+  return(
+    <div className="fadeup">
+      <div className="hero" style={{padding:'24px 32px'}}>
+        <div style={{position:'absolute',right:-20,top:-15,opacity:0.25}} className="f2"><TulipSVG size={130} color="#DDD6FE" inner="white"/></div>
+        <div style={{position:'absolute',left:-20,bottom:-20,opacity:0.2}} className="f1"><WhiteRoseSVG size={120}/></div>
+        <div style={{position:'relative',zIndex:1,display:'flex',alignItems:'center',gap:14,flexWrap:'wrap'}}>
+          <div style={{fontFamily:'Playfair Display',fontSize:28,fontWeight:700,flex:1,minWidth:180}}>📅 {MONTHS[month]} {year}</div>
+          <button onClick={prevM} style={{background:'rgba(255,255,255,0.2)',border:'1.5px solid rgba(255,255,255,0.4)',borderRadius:13,padding:'10px 18px',cursor:'pointer',fontSize:16,color:'white',fontWeight:900}}>◀</button>
+          <select value={month} onChange={e=>setMonth(+e.target.value)} style={{border:'1.5px solid rgba(255,255,255,0.4)',borderRadius:13,padding:'10px 14px',background:'rgba(255,255,255,0.18)',color:'white',fontWeight:800,fontSize:15}}>
+            {MONTHS.map((m,i)=><option key={i} value={i} style={{color:'#1E0A4A',background:'white'}}>{m}</option>)}
+          </select>
+          <select value={year} onChange={e=>setYear(+e.target.value)} style={{border:'1.5px solid rgba(255,255,255,0.4)',borderRadius:13,padding:'10px 14px',background:'rgba(255,255,255,0.18)',color:'white',fontWeight:800,fontSize:15}}>
+            {Array.from({length:20},(_,i)=>2026+i).map(y=><option key={y} value={y} style={{color:'#1E0A4A',background:'white'}}>{y}</option>)}
+          </select>
+          <button onClick={nextM} style={{background:'rgba(255,255,255,0.2)',border:'1.5px solid rgba(255,255,255,0.4)',borderRadius:13,padding:'10px 18px',cursor:'pointer',fontSize:16,color:'white',fontWeight:900}}>▶</button>
+        </div>
+      </div>
+      <SCard>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:6,marginBottom:12}}>
+          {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>(
+            <div key={d} style={{textAlign:'center',fontSize:13,fontWeight:900,color:'#7C3AED',padding:'5px 0',letterSpacing:'0.05em'}}>{d}</div>
+          ))}
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:6}}>
+          {Array.from({length:fdow}).map((_,i)=><div key={`e${i}`}/>)}
+          {Array.from({length:dim},(_,i)=>i+1).map(day=>{
+            const d=ds(day),done=habits.filter(h=>completions[d]?.[h.id]).length;
+            const hasNote=!!(calNotes[d]?.trim()),isToday=d===todayStr();
+            const pct=habits.length?done/habits.length:0;
+            return(
+              <div key={day} className="cday" onClick={()=>{setSel(day);setNoteText(calNotes[ds(day)]||'');}} style={{
+                border:isToday?'2.5px solid #7C3AED':'1.5px solid #EDE9FE',padding:'8px 3px 6px',textAlign:'center',minHeight:66,
+                background:done>0?`rgba(168,85,247,${Math.max(.09,pct*.28)})`:isToday?'#F3EEFF':'white',position:'relative'
+              }}>
+                <div style={{fontSize:15,fontWeight:isToday?900:700,color:isToday?'#7C3AED':'#1E0A4A'}}>{day}</div>
+                {done>0&&<div style={{fontSize:10,color:'#7C3AED',marginTop:2}}>{'🌸'.repeat(Math.min(done,4))}</div>}
+                {hasNote&&<div style={{position:'absolute',top:3,right:5,fontSize:10}}>📝</div>}
+              </div>
+            );
+          })}
+        </div>
+      </SCard>
+      {sel&&(
+        <div style={{position:'fixed',inset:0,background:'rgba(30,10,74,.58)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:20,backdropFilter:'blur(7px)'}}>
+          <div className="bloom" style={{background:'#F5F0FF',borderRadius:30,padding:32,width:'100%',maxWidth:460,maxHeight:'88vh',overflowY:'auto',boxShadow:'0 28px 70px rgba(124,58,237,.32)'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:22}}>
+              <div>
+                <div style={{fontFamily:'Playfair Display',fontSize:24,fontWeight:700,color:'#1E0A4A'}}>{sel} {MONTHS[month].slice(0,3)} {year}</div>
+                <div style={{fontSize:15,color:'#8B5CF6',marginTop:3,fontWeight:700}}>
+                  {['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date(year,month,sel).getDay()]}
+                </div>
+              </div>
+              <button onClick={()=>setSel(null)} style={{background:'#EDE9FE',border:'none',borderRadius:'50%',width:38,height:38,cursor:'pointer',fontSize:16,color:'#7C3AED',fontWeight:900}}>✕</button>
+            </div>
+            <div style={{fontSize:15,fontWeight:900,color:'#5B21B6',marginBottom:8}}>📝 Notes & Reflections</div>
+            <textarea value={noteText} onChange={e=>setNoteText(e.target.value)} placeholder="How was your day? Any beautiful moments to remember..." style={{width:'100%',minHeight:100,border:'1.5px solid #DDD6FE',borderRadius:16,padding:'12px 16px',fontSize:16,resize:'vertical',background:'white',color:'#1E0A4A'}}/>
+            {habits.length>0&&<>
+              <div style={{fontSize:15,fontWeight:900,color:'#5B21B6',margin:'20px 0 12px'}}>🌸 Track Habits</div>
+              <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                {habits.map(h=>{const d=ds(sel),dn=!!(completions[d]?.[h.id]);return(
+                  <div key={h.id} onClick={()=>toggleHabit(h.id,d)} style={{display:'flex',alignItems:'center',gap:13,padding:'13px 16px',borderRadius:16,background:dn?'#EDE9FE':'white',border:`1.5px solid ${dn?'#A855F7':'#DDD6FE'}`,cursor:'pointer',transition:'all .2s'}}>
+                    <div style={{width:30,height:30,borderRadius:10,background:dn?'linear-gradient(135deg,#A855F7,#7C3AED)':'white',border:dn?'none':'2px solid #DDD6FE',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:16,color:'white',fontWeight:900,boxShadow:dn?'0 2px 8px rgba(168,85,247,.4)':'none'}}>{dn?'✓':''}</div>
+                    <span style={{fontSize:22}}>{h.emoji}</span>
+                    <span style={{fontSize:16,fontWeight:800,color:'#1E0A4A'}}>{h.name}</span>
+                  </div>
+                );})}
+              </div>
+            </>}
+            <button onClick={()=>{setCalNotes(p=>({...p,[ds(sel)]:noteText}));setSel(null);}} style={{width:'100%',marginTop:22,padding:'15px',background:'linear-gradient(135deg,#A855F7,#7C3AED)',border:'none',borderRadius:18,cursor:'pointer',fontFamily:'Nunito',fontWeight:900,fontSize:17,color:'white',boxShadow:'0 6px 20px rgba(168,85,247,.45)'}}>
+              Save 🌸
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════
+   PROGRESS PAGE
+══════════════════════════════════════ */
+function ProgressPage({habits,completions}){
+  const now=new Date(),cM=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const el=now.getDate();
+  const mD=(hId)=>{let c=0;for(let d=1;d<=el;d++){if(completions[`${cM}-${String(d).padStart(2,'0')}`]?.[hId])c++;}return c;};
+  const tP=habits.length*el,tD=habits.reduce((s,h)=>s+mD(h.id),0);
+  const oPct=tP?Math.round(tD/tP*100):0;
+  const aT=habits.reduce((s,h)=>s+Object.keys(completions).filter(d=>completions[d]?.[h.id]).length,0);
+  const l7=getLast7();
+  const cD=l7.map(d=>habits.filter(h=>completions[d]?.[h.id]).length);
+  const lbl=l7.map(d=>new Date(d+'T12:00').toLocaleDateString('en',{weekday:'short'}).slice(0,2));
+  return(
+    <div className="fadeup">
+      <div className="hero">
+        <div style={{position:'absolute',right:-25,top:-25,opacity:0.28}} className="f2"><PinkRoseSVG size={160}/></div>
+        <div style={{position:'absolute',left:-20,bottom:-30,opacity:0.22}} className="f3"><TulipSVG size={130} color="#DDD6FE" inner="white"/></div>
+        <div style={{position:'relative',zIndex:1,display:'flex',alignItems:'center',gap:24,flexWrap:'wrap'}}>
+          <div>
+            <div style={{fontFamily:'Playfair Display',fontSize:18,opacity:.85,fontStyle:'italic',marginBottom:6}}>📊 Your Progress</div>
+            <div style={{fontFamily:'Playfair Display',fontSize:72,fontWeight:800,lineHeight:1}}>{oPct}%</div>
+            <div style={{fontSize:18,opacity:.9,marginTop:8,fontWeight:700}}>This month's bloom rate 🌸</div>
+            <div style={{fontSize:15,opacity:.8,marginTop:6}}>{tD}/{tP} habits · All time: {aT} completions 🌟</div>
+          </div>
+          <div style={{display:'flex',flexDirection:'column',gap:8,flex:1,minWidth:180}}>
+            {[{label:'Today',val:habits.filter(h=>completions[todayStr()]?.[h.id]).length,tot:habits.length},
+              {label:'This Month',val:tD,tot:tP}].map(({label,val,tot})=>(
+              <div key={label} style={{background:'rgba(255,255,255,.15)',borderRadius:14,padding:'12px 16px'}}>
+                <div style={{fontSize:13,opacity:.85,fontWeight:700}}>{label}: {val}/{tot}</div>
+                <div style={{height:8,background:'rgba(255,255,255,.2)',borderRadius:4,marginTop:6,overflow:'hidden'}}>
+                  <div style={{width:`${tot?Math.round(val/tot*100):0}%`,height:'100%',background:'linear-gradient(to right,#FDE68A,#FBBF24)',borderRadius:4,transition:'width .6s ease'}}/>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <SCard>
+        <STitle icon="📈" sub="Habits completed each day">Last 7 Days</STitle>
+        <BarChart data={cD} labels={lbl} color="#A855F7" maxVal={Math.max(habits.length,1)}/>
+      </SCard>
+
+      <SCard>
+        <STitle icon="🌸" sub="Streak · Monthly completion for each habit">Habit Bloom Report</STitle>
+        {habits.length===0?<div style={{textAlign:'center',color:'#8B5CF6',fontStyle:'italic',padding:28,fontSize:17}}>No habits yet!</div>:(
+          <div style={{display:'flex',flexDirection:'column',gap:20}}>
+            {habits.map(h=>{
+              const s=getStreak(h.id,completions),md=mD(h.id),mpct=el?Math.round(md/el*100):0;
+              return(
+                <div key={h.id}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+                    <div style={{display:'flex',alignItems:'center',gap:12}}>
+                      <div style={{width:44,height:44,display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
+                        <GrowingSunflower growth={Math.min(10,s)} size={44}/>
+                      </div>
+                      <div>
+                        <div style={{fontSize:17,fontWeight:900,color:'#1E0A4A'}}>{h.emoji} {h.name}</div>
+                        <div style={{fontSize:13,color:'#8B5CF6',marginTop:2,fontWeight:700}}>🔥 {s} day streak · {md}/{el} days this month</div>
+                      </div>
+                    </div>
+                    <div style={{fontSize:22,fontWeight:900,color:'#7C3AED'}}>{mpct}%</div>
+                  </div>
+                  <div style={{height:12,background:'#F3EEFF',borderRadius:6,overflow:'hidden'}}>
+                    <div style={{width:`${mpct}%`,height:'100%',background:`linear-gradient(to right,${h.color||'#A855F7'},#7C3AED)`,borderRadius:6,transition:'width .7s ease'}}/>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </SCard>
+
+      {habits.length>0&&(
+        <SCard>
+          <STitle icon="🌷" sub="Each flower grows with your streak">Your Bloom Garden</STitle>
+          <div style={{display:'flex',flexWrap:'wrap',gap:22,justifyContent:'flex-start'}}>
+            {habits.map(h=>{const s=getStreak(h.id,completions);return(
+              <div key={h.id} style={{textAlign:'center',width:106}}>
+                <div style={{width:106,height:106,display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
+                  <GrowingSunflower growth={Math.min(10,s)} size={104} animate={s>=10}/>
+                </div>
+                <div style={{fontSize:13,fontWeight:900,color:'#1E0A4A',marginTop:6,lineHeight:1.3}}>{h.emoji} {h.name.split(' ').slice(0,2).join(' ')}</div>
+                <div style={{fontSize:12,color:'#8B5CF6',marginTop:2,fontWeight:700}}>🔥{s}d · Stage {Math.min(10,s)}/10</div>
+              </div>
+            );})}
+          </div>
+        </SCard>
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════
+   FITNESS PAGE
+══════════════════════════════════════ */
+function FitnessPage({fitness,setFitness}){
+  const [selDate,setSelDate]=useState(todayStr());
+  const fd=fitness[selDate]||{water:0,breakfast:0,lunch:0,snacks:0,dinner:0,steps:0};
+  const calGoal=fitness._calGoal||2000;
+  const [editGoal,setEditGoal]=useState(false);
+  const [goalInp,setGoalInp]=useState(String(calGoal));
+  const upd=(k,v)=>setFitness(p=>({...p,[selDate]:{...(p[selDate]||{}),[k]:v}}));
+  const totalCal=(fd.breakfast||0)+(fd.lunch||0)+(fd.snacks||0)+(fd.dinner||0);
+  const rem=calGoal-totalCal,calPct=Math.min(100,Math.round(totalCal/calGoal*100));
+  const l7=getLast7();
+  const wD=l7.map(d=>(fitness[d]||{}).water||0);
+  const cD=l7.map(d=>{const f=fitness[d]||{};return(f.breakfast||0)+(f.lunch||0)+(f.snacks||0)+(f.dinner||0);});
+  const sD=l7.map(d=>(fitness[d]||{}).steps||0);
+  const lbl=l7.map(d=>new Date(d+'T12:00').toLocaleDateString('en',{weekday:'short'}).slice(0,2));
+  const meals=[{k:'breakfast',e:'🍳',l:'Breakfast'},{k:'lunch',e:'🥗',l:'Lunch'},{k:'snacks',e:'🍎',l:'Snacks'},{k:'dinner',e:'🌙',l:'Dinner'}];
+
+  return(
+    <div className="fadeup">
+      <div className="hero">
+        <div style={{position:'absolute',right:-20,top:-20,opacity:0.25}} className="f1"><SunflowerBig size={150}/></div>
+        <div style={{position:'absolute',left:-20,bottom:-25,opacity:0.2}} className="f3"><LavenderSprig size={90}/></div>
+        <div style={{position:'relative',zIndex:1,display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:16}}>
+          <div>
+            <div style={{fontFamily:'Playfair Display',fontSize:30,fontWeight:700,marginBottom:6}}>💪 Fitness Tracker</div>
+            <div style={{fontSize:17,opacity:.88,fontWeight:600}}>Nourish your body, track your wellness</div>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:10,background:'rgba(255,255,255,.18)',borderRadius:16,padding:'10px 16px'}}>
+            <span style={{fontSize:15,opacity:.9,fontWeight:700}}>📅 Date:</span>
+            <input type="date" value={selDate} min="2020-01-01" max="2045-12-31" onChange={e=>setSelDate(e.target.value)}
+              style={{border:'none',borderRadius:10,padding:'7px 12px',fontSize:15,background:'rgba(255,255,255,.25)',color:'white',fontFamily:'Nunito',fontWeight:800}}/>
+          </div>
+        </div>
+      </div>
+
+      {/* Water */}
+      <SCard>
+        <STitle icon="💧" sub={`Today: ${fd.water} / 8 glasses — stay hydrated! 🌿`}>Water Intake</STitle>
+        <div style={{display:'flex',gap:10,flexWrap:'wrap',marginBottom:18}}>
+          {Array.from({length:12}).map((_,i)=>{const f=i<fd.water;return(
+            <button key={i} className="glass-pip" onClick={()=>upd('water',Math.max(0,i<fd.water?i:i+1))}
+              style={{width:54,height:66,borderRadius:14,border:`2px solid ${f?'#3B82F6':'#DDD6FE'}`,background:f?'linear-gradient(to bottom,#93C5FD,#3B82F6)':'white',cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',padding:'5px 0',boxShadow:f?'0 4px 12px rgba(59,130,246,.32)':'none'}}>
+              <div style={{fontSize:10,color:f?'white':'#C4B5FD',fontWeight:800,marginBottom:2}}>{i+1}</div>
+              <div style={{fontSize:22}}>{f?'💧':'○'}</div>
+            </button>
+          );})}
+        </div>
+        <div style={{display:'flex',gap:12}}>
+          <button onClick={()=>upd('water',Math.max(0,(fd.water||0)-1))} style={{flex:1,padding:'12px',background:'#F3EEFF',border:'1.5px solid #DDD6FE',borderRadius:14,cursor:'pointer',fontSize:16,fontWeight:800,color:'#7C3AED'}}>− Remove Glass</button>
+          <button onClick={()=>upd('water',Math.min(12,(fd.water||0)+1))} style={{flex:1,padding:'12px',background:'linear-gradient(135deg,#3B82F6,#60A5FA)',border:'none',borderRadius:14,cursor:'pointer',fontSize:16,fontWeight:800,color:'white',boxShadow:'0 4px 12px rgba(59,130,246,.32)'}}>+ Add Glass 💧</button>
+        </div>
+      </SCard>
+
+      {/* Calories */}
+      <SCard>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18,flexWrap:'wrap',gap:10}}>
+          <STitle icon="🔥" style={{marginBottom:0}}>Calorie Tracker</STitle>
+          {editGoal?(
+            <div style={{display:'flex',gap:8,alignItems:'center'}}>
+              <input type="number" value={goalInp} onChange={e=>setGoalInp(e.target.value)}
+                style={{width:100,padding:'9px 12px',border:'1.5px solid #DDD6FE',borderRadius:12,fontSize:16,fontWeight:800,color:'#1E0A4A',background:'#F3EEFF'}}/>
+              <button onClick={()=>{const v=parseInt(goalInp)||2000;setFitness(p=>({...p,_calGoal:v}));setEditGoal(false);}}
+                style={{background:'#A855F7',border:'none',borderRadius:12,padding:'9px 16px',cursor:'pointer',color:'white',fontWeight:900,fontSize:15}}>Save</button>
+            </div>
+          ):(
+            <button onClick={()=>{setEditGoal(true);setGoalInp(String(calGoal));}}
+              style={{background:'#F3EEFF',border:'1.5px solid #DDD6FE',borderRadius:12,padding:'9px 16px',cursor:'pointer',fontSize:14,fontWeight:800,color:'#7C3AED'}}>Edit Goal ✏️ ({calGoal} kcal)</button>
+          )}
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:28,marginBottom:24,flexWrap:'wrap'}}>
+          <div style={{position:'relative',width:150,height:150,flexShrink:0}}>
+            <svg viewBox="0 0 100 100" width={150} height={150}>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#EDE9FE" strokeWidth="14"/>
+              <circle cx="50" cy="50" r="40" fill="none" stroke={rem<0?'#EF4444':'url(#calG)'} strokeWidth="14"
+                strokeDasharray={`${2*Math.PI*40*calPct/100} ${2*Math.PI*40*(1-calPct/100)}`}
+                strokeLinecap="round" transform="rotate(-90 50 50)" style={{transition:'all .6s ease'}}/>
+              <defs><linearGradient id="calG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#A855F7"/><stop offset="100%" stopColor="#EC4899"/></linearGradient></defs>
+              <text x="50" y="44" textAnchor="middle" fontSize="17" fontWeight="900" fill="#1E0A4A">{totalCal}</text>
+              <text x="50" y="55" textAnchor="middle" fontSize="8.5" fill="#8B5CF6">kcal eaten</text>
+              <text x="50" y="66" textAnchor="middle" fontSize="9" fill={rem<0?'#EF4444':'#059669'} fontWeight="900">
+                {rem<0?`${Math.abs(rem)} over`:`${rem} left`}
+              </text>
+            </svg>
+          </div>
+          <div style={{flex:1,minWidth:180,display:'flex',flexDirection:'column',gap:10}}>
+            {[{l:'Daily Goal',v:`${calGoal} kcal`,c:'#7C3AED'},{l:'Consumed',v:`${totalCal} kcal`,c:'#A855F7'},{l:rem<0?'⚠️ Over by':'✅ Remaining',v:`${Math.abs(rem)} kcal`,c:rem<0?'#EF4444':'#059669'}].map(({l,v,c})=>(
+              <div key={l} style={{background:'#F3EEFF',borderRadius:12,padding:'11px 15px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <span style={{fontSize:15,fontWeight:700,color:'#5B21B6'}}>{l}</span>
+                <span style={{fontSize:17,fontWeight:900,color:c}}>{v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:14}}>
+          {meals.map(({k,e,l})=>(
+            <div key={k} style={{background:'#F3EEFF',borderRadius:18,padding:'18px 16px',border:'1.5px solid #DDD6FE'}}>
+              <div style={{fontSize:16,fontWeight:900,color:'#1E0A4A',marginBottom:10}}>{e} {l}</div>
+              <div style={{display:'flex',alignItems:'center',gap:8}}>
+                <input type="number" min="0" max="5000" value={fd[k]||''} placeholder="0 kcal"
+                  onChange={e=>upd(k,Math.max(0,parseInt(e.target.value)||0))}
+                  style={{flex:1,border:'1.5px solid #C4B5FD',borderRadius:12,padding:'10px 12px',fontSize:17,fontWeight:800,color:'#1E0A4A',background:'white'}}/>
+                <span style={{fontSize:14,color:'#8B5CF6',fontWeight:800,flexShrink:0}}>kcal</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </SCard>
+
+      {/* Steps */}
+      <SCard>
+        <STitle icon="🚶" sub="Track your steps and stay active">Daily Steps</STitle>
+        <div style={{display:'flex',gap:16,alignItems:'center',flexWrap:'wrap',marginBottom:16}}>
+          <input type="number" min="0" max="100000" value={fd.steps||''} placeholder="Enter your steps..."
+            onChange={e=>upd('steps',Math.max(0,parseInt(e.target.value)||0))}
+            style={{flex:1,minWidth:200,border:'1.5px solid #DDD6FE',borderRadius:16,padding:'14px 18px',fontSize:24,fontWeight:900,color:'#1E0A4A',background:'#F3EEFF'}}/>
+          <div style={{textAlign:'center',padding:'16px 22px',background:'linear-gradient(135deg,#A855F7,#7C3AED)',borderRadius:18,color:'white',boxShadow:'0 5px 16px rgba(168,85,247,.38)'}}>
+            <div style={{fontSize:28,fontWeight:900}}>{(fd.steps||0).toLocaleString()}</div>
+            <div style={{fontSize:13,opacity:.88,fontWeight:700}}>steps</div>
+          </div>
+          <div style={{textAlign:'center',padding:'16px 22px',background:'#F3EEFF',borderRadius:18,border:'1.5px solid #DDD6FE'}}>
+            <div style={{fontSize:24,fontWeight:900,color:'#7C3AED'}}>{(Math.round((fd.steps||0)*.0007*100)/100).toFixed(2)}</div>
+            <div style={{fontSize:13,color:'#8B5CF6',fontWeight:700}}>km walked</div>
+          </div>
+        </div>
+        <div style={{marginBottom:8}}>
+          <div style={{display:'flex',justifyContent:'space-between',fontSize:14,fontWeight:800,color:'#8B5CF6',marginBottom:8}}>
+            <span>Goal: 10,000 steps</span>
+            <span style={{color:fd.steps>=10000?'#059669':'#8B5CF6'}}>{Math.min(100,Math.round((fd.steps||0)/100))}%</span>
+          </div>
+          <div style={{height:16,background:'#F3EEFF',borderRadius:8,overflow:'hidden',border:'1.5px solid #DDD6FE'}}>
+            <div style={{width:`${Math.min(100,Math.round((fd.steps||0)/100))}%`,height:'100%',background:'linear-gradient(to right,#34D399,#059669)',borderRadius:8,transition:'width .6s ease'}}/>
+          </div>
+        </div>
+        <div style={{fontSize:15,color:fd.steps>=10000?'#059669':'#8B5CF6',fontWeight:800,marginTop:10}}>
+          {(fd.steps||0)>=10000?'🎉 Daily goal reached — you are amazing!!':(fd.steps||0)>=7500?'🔥 So close to 10K! Push through!':(fd.steps||0)>=5000?'💪 Halfway to the goal!':'🌟 Every step brings you closer!'}
+        </div>
+      </SCard>
+
+      {/* Charts */}
+      <SCard>
+        <STitle icon="📊" sub="7-day wellness overview">Weekly Trends</STitle>
+        <div style={{fontFamily:'Playfair Display',fontSize:18,fontWeight:600,color:'#5B21B6',marginBottom:10}}>💧 Water (glasses)</div>
+        <BarChart data={wD} labels={lbl} color="#60A5FA" maxVal={12}/>
+        <div style={{fontFamily:'Playfair Display',fontSize:18,fontWeight:600,color:'#5B21B6',margin:'22px 0 10px'}}>🔥 Calories (kcal)</div>
+        <BarChart data={cD} labels={lbl} color="#F472B6" maxVal={Math.max(calGoal,1)}/>
+        <div style={{fontFamily:'Playfair Display',fontSize:18,fontWeight:600,color:'#5B21B6',margin:'22px 0 10px'}}>🚶 Steps</div>
+        <BarChart data={sD} labels={lbl} color="#34D399" maxVal={Math.max(10000,...sD)}/>
+      </SCard>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════
+   CUSTOM SECTION PAGE
+══════════════════════════════════════ */
+function CustomSectionPage({section,data,setData}){
+  const cats=data.categories||[];
+  const items=data.items||{};
+  const [view,setView]=useState('overview'); // 'overview' | catId
+  const [showAddCat,setShowAddCat]=useState(false);
+  const [catForm,setCatForm]=useState({name:'',emoji:'⭐',color:'#A855F7',flowerType:'sunflower'});
+  const [showAddItem,setShowAddItem]=useState(false);
+  const [itemForm,setItemForm]=useState({title:'',note:'',date:'',priority:'Medium',tag:''});
+
+  const addCat=()=>{
+    if(!catForm.name.trim())return;
+    const cat={id:uid(),name:catForm.name.trim(),emoji:catForm.emoji,color:catForm.color,flowerType:catForm.flowerType};
+    setData(p=>({...p,categories:[...(p.categories||[]),cat],items:{...(p.items||{}),[cat.id]:[]}}));
+    setCatForm({name:'',emoji:'⭐',color:'#A855F7',flowerType:'sunflower'});setShowAddCat(false);
+  };
+  const delCat=(id)=>{setData(p=>{const c=(p.categories||[]).filter(c=>c.id!==id);const it={...(p.items||{})};delete it[id];return{...p,categories:c,items:it};});if(view===id)setView('overview');};
+  const addItem=(catId)=>{
+    if(!itemForm.title.trim())return;
+    const it={id:uid(),...itemForm,done:false,addedDate:todayStr(),doneDate:null};
+    setData(p=>({...p,items:{...(p.items||{}),[catId]:[...(p.items?.[catId]||[]),it]}}));
+    setItemForm({title:'',note:'',date:'',priority:'Medium',tag:''});setShowAddItem(false);
+  };
+  const toggleItem=(catId,itemId)=>{
+    setData(p=>({...p,items:{...(p.items||{}),[catId]:(p.items?.[catId]||[]).map(it=>it.id===itemId?{...it,done:!it.done,doneDate:!it.done?todayStr():null}:it)}}));
+  };
+  const delItem=(catId,itemId)=>{
+    setData(p=>({...p,items:{...(p.items||{}),[catId]:(p.items?.[catId]||[]).filter(it=>it.id!==itemId)}}));
+  };
+  const flowerTypes=['sunflower','rose','white-rose','tulip','lavender'];
+
+  if(view!=='overview'){
+    const cat=cats.find(c=>c.id===view);
+    if(!cat)return null;
+    const catItems=items[view]||[];
+    const done=catItems.filter(i=>i.done).length;
+    const pct=catItems.length?Math.round(done/catItems.length*100):0;
+    const growth=catItems.length?Math.min(10,Math.round(pct/10)):0;
+    return(
+      <div className="fadeup">
+        <div className="hero" style={{display:'flex',alignItems:'center',gap:18,flexWrap:'wrap'}}>
+          <div style={{position:'absolute',right:-20,top:-20,opacity:0.25}} className="f2">
+            {cat.flowerType==='rose'?<PinkRoseSVG size={140}/>:cat.flowerType==='white-rose'?<WhiteRoseSVG size={140}/>:cat.flowerType==='tulip'?<TulipSVG size={120} color="#DDD6FE" inner="white"/>:<SunflowerBig size={140}/>}
+          </div>
+          <button onClick={()=>setView('overview')} style={{background:'rgba(255,255,255,.2)',border:'1.5px solid rgba(255,255,255,.4)',borderRadius:12,padding:'10px 18px',cursor:'pointer',fontSize:16,color:'white',fontWeight:900}}>◀ Back</button>
+          <div style={{flex:1,position:'relative',zIndex:1}}>
+            <div style={{fontFamily:'Playfair Display',fontSize:28,fontWeight:700}}>{cat.emoji} {cat.name}</div>
+            <div style={{fontSize:16,opacity:.88,marginTop:4,fontWeight:600}}>{done}/{catItems.length} completed · {pct}% bloomed</div>
+          </div>
+          <div style={{width:80,height:80,display:'flex',alignItems:'flex-end',justifyContent:'center',flexShrink:0}}>
+            <GrowingSunflower growth={growth} size={80} animate={pct===100}/>
+          </div>
+          <button onClick={()=>setShowAddItem(true)} style={{background:'rgba(255,255,255,.25)',border:'1.5px solid rgba(255,255,255,.5)',borderRadius:14,padding:'12px 20px',cursor:'pointer',fontSize:16,fontWeight:900,color:'white'}}>+ Add Item</button>
+        </div>
+
+        {showAddItem&&(
+          <SCard style={{background:'#F3EEFF',border:'2px solid #C4B5FD'}}>
+            <STitle icon="✨">Add New Item</STitle>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}}>
+              <div style={{gridColumn:'1/-1'}}>
+                <label style={{fontSize:15,fontWeight:800,color:'#5B21B6',display:'block',marginBottom:6}}>Title *</label>
+                <input type="text" value={itemForm.title} onChange={e=>setItemForm(p=>({...p,title:e.target.value}))} placeholder="What do you want to achieve?"
+                  style={{width:'100%',border:'1.5px solid #DDD6FE',borderRadius:13,padding:'12px 15px',fontSize:16,color:'#1E0A4A',background:'white'}}/>
+              </div>
+              <div>
+                <label style={{fontSize:15,fontWeight:800,color:'#5B21B6',display:'block',marginBottom:6}}>Target Date</label>
+                <input type="date" value={itemForm.date} onChange={e=>setItemForm(p=>({...p,date:e.target.value}))}
+                  style={{width:'100%',border:'1.5px solid #DDD6FE',borderRadius:13,padding:'12px 15px',fontSize:15,color:'#1E0A4A',background:'white'}}/>
+              </div>
+              <div>
+                <label style={{fontSize:15,fontWeight:800,color:'#5B21B6',display:'block',marginBottom:6}}>Priority</label>
+                <select value={itemForm.priority} onChange={e=>setItemForm(p=>({...p,priority:e.target.value}))}
+                  style={{width:'100%',border:'1.5px solid #DDD6FE',borderRadius:13,padding:'12px 15px',fontSize:15,color:'#1E0A4A',background:'white'}}>
+                  <option>🔴 High</option><option>🟡 Medium</option><option>🟢 Low</option>
+                </select>
+              </div>
+              <div>
+                <label style={{fontSize:15,fontWeight:800,color:'#5B21B6',display:'block',marginBottom:6}}>Tag / Label</label>
+                <input type="text" value={itemForm.tag} onChange={e=>setItemForm(p=>({...p,tag:e.target.value}))} placeholder="e.g. personal, work..."
+                  style={{width:'100%',border:'1.5px solid #DDD6FE',borderRadius:13,padding:'12px 15px',fontSize:15,color:'#1E0A4A',background:'white'}}/>
+              </div>
+              <div style={{gridColumn:'1/-1'}}>
+                <label style={{fontSize:15,fontWeight:800,color:'#5B21B6',display:'block',marginBottom:6}}>Notes</label>
+                <textarea value={itemForm.note} onChange={e=>setItemForm(p=>({...p,note:e.target.value}))} placeholder="Any details, ideas, or steps..."
+                  style={{width:'100%',minHeight:80,border:'1.5px solid #DDD6FE',borderRadius:13,padding:'12px 15px',fontSize:15,resize:'vertical',background:'white',color:'#1E0A4A'}}/>
+              </div>
+            </div>
+            <div style={{display:'flex',gap:12}}>
+              <button onClick={()=>addItem(view)} style={{flex:1,padding:'14px',background:'linear-gradient(135deg,#A855F7,#7C3AED)',border:'none',borderRadius:16,cursor:'pointer',fontFamily:'Nunito',fontWeight:900,fontSize:17,color:'white',boxShadow:'0 5px 16px rgba(168,85,247,.4)'}}>Add 🌸</button>
+              <button onClick={()=>setShowAddItem(false)} style={{padding:'14px 20px',background:'white',border:'1.5px solid #DDD6FE',borderRadius:16,cursor:'pointer',fontWeight:800,fontSize:16,color:'#7C3AED'}}>Cancel</button>
+            </div>
+          </SCard>
+        )}
+
+        {/* Items list + chart */}
+        {catItems.length>0&&(
+          <SCard>
+            <STitle icon="📊" sub="Completion progress">Progress Chart</STitle>
+            <BarChart data={[done,catItems.length-done]} labels={['Done','Pending']} color={cat.color||'#A855F7'} maxVal={catItems.length}/>
+          </SCard>
+        )}
+
+        <div style={{display:'flex',flexDirection:'column',gap:13}}>
+          {catItems.length===0&&(
+            <SCard style={{textAlign:'center',padding:'48px 24px'}}>
+              <div style={{marginBottom:16}}><GrowingSunflower growth={0} size={80}/></div>
+              <div style={{fontSize:18,color:'#8B5CF6',fontStyle:'italic',fontWeight:700}}>No items yet — add your first one above! 🌱</div>
+            </SCard>
+          )}
+          {catItems.map(item=>{
+            const pCol=item.priority?.includes('High')?'#EF4444':item.priority?.includes('Low')?'#22C55E':'#F59E0B';
+            return(
+              <div key={item.id} style={{background:'white',borderRadius:22,padding:'20px 22px',border:`1.5px solid ${item.done?'#A855F7':'#DDD6FE'}`,boxShadow:'0 2px 12px rgba(124,58,237,.07)',opacity:item.done?.82:1,transition:'all .25s'}}>
+                <div style={{display:'flex',alignItems:'flex-start',gap:14}}>
+                  <button onClick={()=>toggleItem(view,item.id)} style={{width:34,height:34,borderRadius:10,background:item.done?'linear-gradient(135deg,#A855F7,#7C3AED)':'white',border:item.done?'none':'2px solid #DDD6FE',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',flexShrink:0,fontSize:17,color:'white',fontWeight:900,boxShadow:item.done?'0 2px 8px rgba(168,85,247,.42)':'none',marginTop:2}}>
+                    {item.done?'✓':''}
+                  </button>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:17,fontWeight:900,color:item.done?'#8B5CF6':'#1E0A4A',textDecoration:item.done?'line-through':'none',marginBottom:5}}>{item.title}</div>
+                    {item.note&&<div style={{fontSize:14,color:'#5B21B6',background:'#F3EEFF',borderRadius:10,padding:'7px 12px',marginBottom:7}}>{item.note}</div>}
+                    <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
+                      {item.priority&&<span style={{fontSize:13,background:pCol+'22',color:pCol,borderRadius:8,padding:'3px 10px',fontWeight:800}}>{item.priority}</span>}
+                      {item.tag&&<span style={{fontSize:13,background:'#EDE9FE',color:'#7C3AED',borderRadius:8,padding:'3px 10px',fontWeight:700}}>#{item.tag}</span>}
+                      {item.date&&<span style={{fontSize:13,color:'#8B5CF6',fontWeight:700}}>📅 {item.date}</span>}
+                      {item.done&&item.doneDate&&<span style={{fontSize:13,color:'#22C55E',fontWeight:800}}>✅ {item.doneDate}</span>}
+                    </div>
+                  </div>
+                  <button className="del-btn" onClick={()=>delItem(view,item.id)} style={{background:'#F3EEFF',border:'none',borderRadius:11,width:34,height:34,cursor:'pointer',fontSize:15,color:'#C04040',flexShrink:0,transition:'all .2s'}}>🗑</button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // Overview
+  const totalItems=Object.values(items).flat().length;
+  const totalDone=Object.values(items).flat().filter(i=>i.done).length;
+  return(
+    <div className="fadeup">
+      <div className="hero">
+        <div style={{position:'absolute',right:-25,top:-25,opacity:0.28}} className="f2">
+          {section.flowerDecor==='rose'?<PinkRoseSVG size={160}/>:section.flowerDecor==='white-rose'?<WhiteRoseSVG size={160}/>:section.flowerDecor==='tulip'?<TulipSVG size={140} color="#DDD6FE" inner="white"/>:<SunflowerBig size={155}/>}
+        </div>
+        <div style={{position:'absolute',left:-20,bottom:-30,opacity:0.2}} className="f3"><LavenderSprig size={90}/></div>
+        <div style={{position:'relative',zIndex:1}}>
+          <div style={{fontFamily:'Playfair Display',fontSize:34,fontWeight:700,marginBottom:8}}>{section.emoji} {section.name}</div>
+          <div style={{fontSize:18,opacity:.9,fontWeight:600,marginBottom:16}}>{section.description||'Your personal tracking space ✨'}</div>
+          <div style={{display:'flex',gap:16,flexWrap:'wrap'}}>
+            {[{l:'Categories',v:cats.length,i:'📁'},{l:'Total Items',v:totalItems,i:'🎯'},{l:'Completed',v:totalDone,i:'✅'},{l:'Progress',v:`${totalItems?Math.round(totalDone/totalItems*100):0}%`,i:'🌸'}].map(({l,v,i})=>(
+              <div key={l} style={{background:'rgba(255,255,255,.2)',borderRadius:14,padding:'12px 18px',textAlign:'center',minWidth:80}}>
+                <div style={{fontSize:20}}>{i}</div>
+                <div style={{fontSize:22,fontWeight:900,lineHeight:1}}>{v}</div>
+                <div style={{fontSize:12,opacity:.85,fontWeight:700,marginTop:3}}>{l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Category grid */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:18,marginBottom:20}}>
+        {cats.map(cat=>{
+          const its=items[cat.id]||[];
+          const dn=its.filter(i=>i.done).length;
+          const pct=its.length?Math.round(dn/its.length*100):0;
+          const growth=its.length?Math.min(10,Math.round(pct/10)):0;
+          return(
+            <div key={cat.id} className="seccard" onClick={()=>setView(cat.id)}
+              style={{background:'white',border:`2px solid ${cat.color}44`,borderRadius:24,padding:'24px 20px',cursor:'pointer',textAlign:'center',boxShadow:'0 4px 14px rgba(124,58,237,.08)',position:'relative'}}>
+              <button className="del-btn" onClick={e=>{e.stopPropagation();delCat(cat.id);}}
+                style={{position:'absolute',top:12,right:12,background:'#F3EEFF',border:'none',borderRadius:'50%',width:30,height:30,cursor:'pointer',fontSize:13,color:'#C04040'}}>✕</button>
+              <div style={{width:90,height:90,margin:'0 auto 12px',display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
+                {cat.flowerType==='rose'?<PinkRoseSVG size={82}/>:cat.flowerType==='white-rose'?<WhiteRoseSVG size={82}/>:cat.flowerType==='tulip'?<TulipSVG size={80} color={cat.color||'#A855F7'} inner="#E879F9"/>:cat.flowerType==='lavender'?<LavenderSprig size={56}/>:<GrowingSunflower growth={growth} size={88} animate={pct===100}/>}
+              </div>
+              <div style={{fontSize:26,marginBottom:6}}>{cat.emoji}</div>
+              <div style={{fontWeight:900,fontSize:17,color:'#1E0A4A',marginBottom:6}}>{cat.name}</div>
+              <div style={{fontSize:14,color:'#8B5CF6',fontWeight:700,marginBottom:10}}>{its.length} items · {dn} done · {pct}%</div>
+              {its.length>0&&<div style={{height:8,background:'#F3EEFF',borderRadius:4,overflow:'hidden'}}>
+                <div style={{width:`${pct}%`,height:'100%',background:`linear-gradient(to right,${cat.color||'#A855F7'},#7C3AED)`,borderRadius:4,transition:'width .6s ease'}}/>
+              </div>}
+            </div>
+          );
+        })}
+
+        {/* Add category card */}
+        {!showAddCat&&(
+          <div onClick={()=>setShowAddCat(true)} style={{background:'white',border:'2.5px dashed #DDD6FE',borderRadius:24,padding:'24px 20px',cursor:'pointer',textAlign:'center',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:10,color:'#8B5CF6',minHeight:200,transition:'all .2s'}}>
+            <div style={{fontSize:42,fontWeight:300,color:'#C4B5FD'}}>＋</div>
+            <div style={{fontSize:17,fontWeight:800}}>New Category</div>
+            <div style={{fontSize:13,color:'#C4B5FD',fontWeight:600}}>Click to add</div>
+          </div>
+        )}
+
+        {showAddCat&&(
+          <div style={{background:'white',border:'2px solid #C4B5FD',borderRadius:24,padding:'22px 20px',display:'flex',flexDirection:'column',gap:12}}>
+            <div style={{fontFamily:'Playfair Display',fontSize:18,fontWeight:700,color:'#1E0A4A',marginBottom:4}}>✨ New Category</div>
+            <div style={{display:'flex',gap:8}}>
+              <select value={catForm.emoji} onChange={e=>setCatForm(p=>({...p,emoji:e.target.value}))}
+                style={{border:'1.5px solid #DDD6FE',borderRadius:11,padding:'9px 8px',background:'#F3EEFF',fontSize:20,width:58,color:'#1E0A4A'}}>
+                {ICONS.map(ic=><option key={ic} value={ic}>{ic}</option>)}
+              </select>
+              <input type="text" value={catForm.name} onChange={e=>setCatForm(p=>({...p,name:e.target.value}))} placeholder="Category name..."
+                style={{flex:1,border:'1.5px solid #DDD6FE',borderRadius:11,padding:'9px 12px',fontSize:15,color:'#1E0A4A',background:'#F3EEFF'}}/>
+            </div>
+            <div>
+              <div style={{fontSize:13,fontWeight:800,color:'#5B21B6',marginBottom:6}}>Flower Type</div>
+              <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                {flowerTypes.map(t=>(
+                  <button key={t} onClick={()=>setCatForm(p=>({...p,flowerType:t}))} style={{padding:'6px 12px',borderRadius:10,border:`1.5px solid ${catForm.flowerType===t?'#A855F7':'#DDD6FE'}`,background:catForm.flowerType===t?'#EDE9FE':'white',cursor:'pointer',fontSize:13,fontWeight:800,color:catForm.flowerType===t?'#7C3AED':'#8B5CF6',transition:'all .2s'}}>
+                    {t==='sunflower'?'🌻':t==='rose'?'🌹':t==='white-rose'?'🤍':t==='tulip'?'🌷':'💜'} {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div style={{fontSize:13,fontWeight:800,color:'#5B21B6',marginBottom:6}}>Color</div>
+              <div style={{display:'flex',gap:7,flexWrap:'wrap'}}>
+                {COLORS.map(c=>(
+                  <button key={c} onClick={()=>setCatForm(p=>({...p,color:c}))} style={{width:30,height:30,borderRadius:'50%',background:c,border:catForm.color===c?'3px solid #1E0A4A':'2px solid white',cursor:'pointer',boxShadow:'0 2px 5px rgba(0,0,0,.15)',transform:catForm.color===c?'scale(1.25)':'scale(1)',transition:'all .2s'}}/>
+                ))}
+              </div>
+            </div>
+            <div style={{display:'flex',gap:9}}>
+              <button onClick={addCat} style={{flex:1,padding:'11px',background:'linear-gradient(135deg,#A855F7,#7C3AED)',border:'none',borderRadius:12,cursor:'pointer',color:'white',fontWeight:900,fontSize:15,boxShadow:'0 4px 12px rgba(168,85,247,.38)'}}>Add ✨</button>
+              <button onClick={()=>setShowAddCat(false)} style={{padding:'11px 14px',background:'#F3EEFF',border:'1.5px solid #DDD6FE',borderRadius:12,cursor:'pointer',color:'#7C3AED',fontWeight:800,fontSize:14}}>Cancel</button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Section stats chart */}
+      {cats.length>0&&(
+        <SCard>
+          <STitle icon="🌸" sub="Completion per category">Category Bloom Chart</STitle>
+          <BarChart
+            data={cats.map(c=>{const its=items[c.id]||[];return its.length?Math.round(its.filter(i=>i.done).length/its.length*100):0;})}
+            labels={cats.map(c=>c.emoji)}
+            color="#A855F7"
+            unit="%"
+            maxVal={100}
+          />
+          {/* Full garden view */}
+          <div style={{display:'flex',flexWrap:'wrap',gap:22,justifyContent:'flex-start',marginTop:20}}>
+            {cats.map(cat=>{
+              const its=items[cat.id]||[];
+              const pct=its.length?Math.round(its.filter(i=>i.done).length/its.length*100):0;
+              const growth=Math.min(10,Math.round(pct/10));
+              return(
+                <div key={cat.id} style={{textAlign:'center',width:94}}>
+                  <div style={{width:94,height:94,display:'flex',alignItems:'flex-end',justifyContent:'center',margin:'0 auto 6px'}}>
+                    {cat.flowerType==='rose'?<PinkRoseSVG size={84}/>:cat.flowerType==='white-rose'?<WhiteRoseSVG size={84}/>:cat.flowerType==='tulip'?<TulipSVG size={80} color={cat.color||'#A855F7'} inner="#E879F9"/>:cat.flowerType==='lavender'?<LavenderSprig size={56}/>:<GrowingSunflower growth={growth} size={90} animate={pct===100}/>}
+                  </div>
+                  <div style={{fontSize:13,fontWeight:900,color:'#1E0A4A',lineHeight:1.3}}>{cat.emoji} {cat.name.split(' ')[0]}</div>
+                  <div style={{fontSize:12,color:'#8B5CF6',fontWeight:700,marginTop:2}}>{pct}% bloomed</div>
+                </div>
+              );
+            })}
+          </div>
+        </SCard>
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════
+   MANAGE PAGE
+══════════════════════════════════════ */
+function ManagePage({habits,setHabits,completions}){
+  const [name,setName]=useState('');
+  const [emoji,setEmoji]=useState('🌸');
+  const [color,setColor]=useState(COLORS[0]);
+  const add=()=>{if(!name.trim())return;setHabits(p=>[...p,{id:uid(),name:name.trim(),emoji,color}]);setName('');};
+  return(
+    <div className="fadeup">
+      <div className="hero" style={{padding:'24px 32px'}}>
+        <div style={{position:'absolute',right:-25,top:-25,opacity:0.28}} className="f2"><SunflowerBig size={150}/></div>
+        <div style={{position:'absolute',left:-20,bottom:-25,opacity:0.2}} className="f1"><WhiteRoseSVG size={130}/></div>
+        <div style={{position:'relative',zIndex:1}}>
+          <div style={{fontFamily:'Playfair Display',fontSize:30,fontWeight:700,marginBottom:6}}>⚙️ Manage Habits</div>
+          <div style={{fontSize:17,opacity:.88,fontWeight:600}}>Plant new habits, tend your flower garden 🌸</div>
+        </div>
+      </div>
+      <SCard>
+        <STitle icon="🌱" sub="A new habit starts as a seed, grows with every day">Plant a New Habit</STitle>
+        <div style={{marginBottom:16}}>
+          <label style={{fontSize:16,fontWeight:900,color:'#5B21B6',display:'block',marginBottom:7}}>Habit Name</label>
+          <input type="text" value={name} onChange={e=>setName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&add()} placeholder="e.g. Morning yoga, Skin care, Read daily..." style={{width:'100%',fontSize:17,padding:'13px 17px',border:'1.5px solid #DDD6FE',borderRadius:16,color:'#1E0A4A',background:'#F3EEFF'}}/>
+        </div>
+        <div style={{marginBottom:18}}>
+          <label style={{fontSize:16,fontWeight:900,color:'#5B21B6',display:'block',marginBottom:9}}>Icon</label>
+          <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
+            {ICONS.map(ic=>(
+              <button key={ic} className={`icoBtn${emoji===ic?' sel':''}`} onClick={()=>setEmoji(ic)} style={{width:46,height:46,fontSize:22,cursor:'pointer',borderRadius:13,background:emoji===ic?'#EDE9FE':'white',border:`1.5px solid ${emoji===ic?'#A855F7':'#DDD6FE'}`}}>{ic}</button>
+            ))}
+          </div>
+        </div>
+        <div style={{marginBottom:22}}>
+          <label style={{fontSize:16,fontWeight:900,color:'#5B21B6',display:'block',marginBottom:9}}>Color</label>
+          <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+            {COLORS.map(c=>(
+              <button key={c} onClick={()=>setColor(c)} style={{width:36,height:36,borderRadius:'50%',background:c,cursor:'pointer',border:color===c?'3.5px solid #1E0A4A':'2.5px solid white',boxShadow:'0 2px 6px rgba(0,0,0,.15)',transform:color===c?'scale(1.28)':'scale(1)',transition:'all .2s'}}/>
+            ))}
+          </div>
+        </div>
+        {name.trim()&&(
+          <div style={{display:'flex',alignItems:'center',gap:16,padding:'17px 20px',borderRadius:18,background:'#F3EEFF',border:'2px dashed #C4B5FD',marginBottom:18}}>
+            <GrowingSunflower growth={0} size={60}/>
+            <div>
+              <div style={{fontSize:18,fontWeight:900,color:'#1E0A4A'}}>{emoji} {name}</div>
+              <div style={{fontSize:14,color:'#8B5CF6',marginTop:5,fontWeight:700}}>Starting from seed 🌱</div>
+            </div>
+          </div>
+        )}
+        <button onClick={add} disabled={!name.trim()} className="addBtn"
+          style={{width:'100%',padding:'15px',background:name.trim()?'linear-gradient(135deg,#A855F7,#7C3AED)':'#EDE9FE',border:'none',borderRadius:18,cursor:name.trim()?'pointer':'not-allowed',fontFamily:'Nunito',fontWeight:900,fontSize:18,color:name.trim()?'white':'#C4B5FD',boxShadow:name.trim()?'0 6px 20px rgba(168,85,247,.44)':'none',transition:'all .2s'}}>
+          + Plant New Habit 🌸
+        </button>
+      </SCard>
+      <SCard>
+        <STitle icon="🌷" sub={`${habits.length} habits in your garden`}>Current Habits</STitle>
+        {habits.length===0?<div style={{textAlign:'center',color:'#8B5CF6',fontStyle:'italic',padding:28,fontSize:17}}>No habits yet — plant your first one above! 🌱</div>:(
+          <div style={{display:'flex',flexDirection:'column',gap:12}}>
+            {habits.map((h,idx)=>(
+              <div key={h.id} style={{display:'flex',alignItems:'center',gap:14,padding:'15px 18px',background:'#F3EEFF',borderRadius:18,border:'1.5px solid #DDD6FE'}}>
+                <div style={{fontSize:13,fontWeight:900,color:'#C4B5FD',width:20,textAlign:'center'}}>{idx+1}</div>
+                <div style={{width:8,height:44,borderRadius:4,background:h.color||'#A855F7',flexShrink:0}}/>
+                <div style={{fontSize:26}}>{h.emoji}</div>
+                <div style={{flex:1,fontWeight:900,fontSize:17,color:'#1E0A4A'}}>{h.name}</div>
+                <div style={{fontSize:15,color:'#8B5CF6',fontWeight:800}}>🔥{getStreak(h.id,completions)}d</div>
+                <button className="del-btn" onClick={()=>setHabits(p=>p.filter(x=>x.id!==h.id))} style={{background:'#EDE9FE',border:'none',borderRadius:12,width:38,height:38,cursor:'pointer',fontSize:17,color:'#C04040',flexShrink:0,transition:'all .2s'}}>🗑</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </SCard>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════
+   MAIN APP
+══════════════════════════════════════ */
+const FIXED_NAV=[
+  {id:'today',icon:'🌸',label:'Today'},
+  {id:'calendar',icon:'📅',label:'Calendar'},
+  {id:'progress',icon:'📊',label:'Progress'},
+  {id:'fitness',icon:'💪',label:'Fitness'},
+];
+
+function App(){
+  const [page,setPage]=useState('today');
+  const [habits,setHabits]=useState(null);
+  const [completions,setCompletions]=useState(null);
+  const [calNotes,setCalNotes]=useState(null);
+  const [fitness,setFitness]=useState(null);
+  const [customSections,setCustomSections]=useState(null);
+  const [sectionData,setSectionData]=useState(null);
+  const [loaded,setLoaded]=useState(false);
+  const [showNewSection,setShowNewSection]=useState(false);
+  const [secForm,setSecForm]=useState({name:'',emoji:'⭐',color:'#7C3AED',description:'',flowerDecor:'sunflower'});
+
+  useEffect(()=>{
+    setHabits(LS.get('blt-habits')||DEFAULT_HABITS);
+    setCompletions(LS.get('blt-completions')||{});
+    setCalNotes(LS.get('blt-notes')||{});
+    setFitness(LS.get('blt-fitness')||{});
+    setCustomSections(LS.get('blt-sections')||[
+      {id:'goals',name:'Goals & Life',emoji:'🌟',color:'#F59E0B',description:'Books, future goals, bucket list & dreams',flowerDecor:'sunflower'},
+    ]);
+    setSectionData(LS.get('blt-secdata')||{});
+    setLoaded(true);
+  },[]);
+
+  useEffect(()=>{if(loaded&&habits)LS.set('blt-habits',habits);},[habits,loaded]);
+  useEffect(()=>{if(loaded&&completions)LS.set('blt-completions',completions);},[completions,loaded]);
+  useEffect(()=>{if(loaded&&calNotes)LS.set('blt-notes',calNotes);},[calNotes,loaded]);
+  useEffect(()=>{if(loaded&&fitness)LS.set('blt-fitness',fitness);},[fitness,loaded]);
+  useEffect(()=>{if(loaded&&customSections)LS.set('blt-sections',customSections);},[customSections,loaded]);
+  useEffect(()=>{if(loaded&&sectionData)LS.set('blt-secdata',sectionData);},[sectionData,loaded]);
+
+  const toggleHabit=(hId,ds)=>setCompletions(p=>({...p,[ds]:{...p[ds],[hId]:!p[ds]?.[hId]}}));
+  const todayDone=habits?habits.filter(h=>completions?.[todayStr()]?.[h.id]).length:0;
+
+  const addSection=()=>{
+    if(!secForm.name.trim())return;
+    const sec={id:uid(),name:secForm.name.trim(),emoji:secForm.emoji,color:secForm.color,description:secForm.description,flowerDecor:secForm.flowerDecor};
+    setCustomSections(p=>[...(p||[]),sec]);
+    setSectionData(p=>({...(p||{}),[sec.id]:{categories:[],items:{}}}));
+    setSecForm({name:'',emoji:'⭐',color:'#7C3AED',description:'',flowerDecor:'sunflower'});
+    setShowNewSection(false);
+    setPage(sec.id);
+  };
+  const delSection=(id)=>{
+    setCustomSections(p=>(p||[]).filter(s=>s.id!==id));
+    if(page===id)setPage('today');
+  };
+  const flowerDecorOpts=[{v:'sunflower',l:'🌻 Sunflower'},{v:'rose',l:'🌹 Pink Rose'},{v:'white-rose',l:'🤍 White Rose'},{v:'tulip',l:'🌷 Tulip'}];
+
+  const allNav=[...FIXED_NAV,...(customSections||[]).map(s=>({id:s.id,icon:s.emoji,label:s.name.split(' ')[0]})),{id:'manage',icon:'⚙️',label:'Manage'}];
+
+  return(
+    <div style={{minHeight:'100vh',background:'linear-gradient(160deg,#EDE9FE,#F3EEFF 50%,#F5F0FF)'}}>
+      <BgFlowers/>
+      <div className="site-shell">
+        {/* Header */}
+        <div style={{background:'rgba(237,233,254,.96)',borderBottom:'1.5px solid #C4B5FD',padding:'12px 16px',position:'sticky',top:0,zIndex:100,backdropFilter:'blur(16px)',boxShadow:'0 2px 16px rgba(124,58,237,.10)'}}>
+          <div className="hdr-inner" style={{maxWidth:'900px',margin:'0 auto',display:'flex',alignItems:'center',gap:10,flexWrap:'wrap',width:'100%'}}>
+            {/* Logo */}
+            <div style={{display:'flex',alignItems:'center',gap:9,flexShrink:0}}>
+              <div style={{width:34,height:34,display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
+                <GrowingSunflower growth={8} size={34}/>
+              </div>
+              <div>
+                <div style={{fontFamily:'Playfair Display',fontSize:17,fontWeight:700,color:'#1E0A4A',lineHeight:1}}>My Bloom Tracker</div>
+                <div style={{fontSize:9,color:'#8B5CF6',letterSpacing:'0.1em',textTransform:'uppercase',fontWeight:800}}>Grow with every day</div>
+              </div>
+            </div>
+            {/* Nav */}
+            <div className="nav-scroll">
+              {allNav.map(n=>(
+                <button key={n.id} className={`navb${page===n.id?' act':''}`} onClick={()=>setPage(n.id)}
+                  style={{background:page===n.id?'rgba(168,85,247,.22)':'transparent',border:`2px solid ${page===n.id?'#A855F7':'transparent'}`,borderRadius:12,padding:'6px 10px',cursor:'pointer',color:page===n.id?'#5B21B6':'#8B5CF6',display:'flex',flexDirection:'column',alignItems:'center',gap:1,minWidth:46,position:'relative',flexShrink:0}}>
+                  <span style={{fontSize:19}}>{n.icon}</span>
+                  <span style={{fontSize:10,fontWeight:900,letterSpacing:'0.02em',whiteSpace:'nowrap'}}>{n.label}</span>
+                  {n.id==='today'&&todayDone>0&&habits&&todayDone<habits.length&&<div style={{position:'absolute',top:4,right:4,width:8,height:8,borderRadius:'50%',background:'#A855F7',border:'2px solid white'}}/>}
+                </button>
+              ))}
+              {/* Add Section button */}
+              <button onClick={()=>setShowNewSection(true)} style={{background:'linear-gradient(135deg,#A855F7,#7C3AED)',border:'none',borderRadius:12,padding:'7px 13px',cursor:'pointer',color:'white',fontWeight:900,fontSize:13,whiteSpace:'nowrap',boxShadow:'0 3px 10px rgba(168,85,247,.38)',flexShrink:0}}>
+                ＋ Section
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main content - FULL WIDTH */}
+        <div className="wrap" style={{paddingTop:24}}>
+          {!loaded?(
+            <div style={{textAlign:'center',padding:80,color:'#8B5CF6'}}>
+              <div style={{display:'inline-block',animation:'spin 2s linear infinite',fontSize:60,marginBottom:20}}>🌸</div>
+              <div style={{fontFamily:'Playfair Display',fontSize:26,fontStyle:'italic',color:'#5B21B6'}}>Loading your bloom garden...</div>
+            </div>
+          ):(
+            <>
+              {page==='today'&&<TodayPage habits={habits} completions={completions} toggleHabit={toggleHabit}/>}
+              {page==='calendar'&&<CalendarPage calNotes={calNotes} setCalNotes={setCalNotes} completions={completions} toggleHabit={toggleHabit} habits={habits}/>}
+              {page==='progress'&&<ProgressPage habits={habits} completions={completions}/>}
+              {page==='fitness'&&<FitnessPage fitness={fitness} setFitness={setFitness}/>}
+              {page==='manage'&&<ManagePage habits={habits} setHabits={setHabits} completions={completions}/>}
+              {(customSections||[]).map(sec=>page===sec.id&&(
+                <div key={sec.id}>
+                  <div style={{display:'flex',justifyContent:'flex-end',marginBottom:10}}>
+                    <button onClick={()=>delSection(sec.id)} style={{background:'#F3EEFF',border:'1.5px solid #DDD6FE',borderRadius:12,padding:'8px 14px',cursor:'pointer',fontSize:14,fontWeight:800,color:'#C04040'}}>🗑 Delete Section</button>
+                  </div>
+                  <CustomSectionPage
+                    section={sec}
+                    data={sectionData?.[sec.id]||{categories:[],items:{}}}
+                    setData={d=>setSectionData(p=>({...(p||{}),[sec.id]:typeof d==='function'?d(p?.[sec.id]||{categories:[],items:{}}):d}))}
+                  />
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* New Section Modal */}
+      {showNewSection&&(
+        <div style={{position:'fixed',inset:0,background:'rgba(30,10,74,.6)',zIndex:300,display:'flex',alignItems:'center',justifyContent:'center',padding:20,backdropFilter:'blur(8px)'}}>
+          <div className="bloom" style={{background:'#F5F0FF',borderRadius:32,padding:36,width:'100%',maxWidth:480,boxShadow:'0 30px 80px rgba(124,58,237,.35)',maxHeight:'90vh',overflowY:'auto'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:24}}>
+              <div style={{fontFamily:'Playfair Display',fontSize:26,fontWeight:700,color:'#1E0A4A'}}>✨ New Section</div>
+              <button onClick={()=>setShowNewSection(false)} style={{background:'#EDE9FE',border:'none',borderRadius:'50%',width:40,height:40,cursor:'pointer',fontSize:18,color:'#7C3AED',fontWeight:900}}>✕</button>
+            </div>
+            <div style={{display:'flex',flexDirection:'column',gap:16}}>
+              <div style={{display:'flex',gap:10}}>
+                <select value={secForm.emoji} onChange={e=>setSecForm(p=>({...p,emoji:e.target.value}))}
+                  style={{border:'1.5px solid #DDD6FE',borderRadius:14,padding:'11px 10px',background:'#F3EEFF',fontSize:22,width:62,color:'#1E0A4A'}}>
+                  {ICONS.map(ic=><option key={ic} value={ic}>{ic}</option>)}
+                </select>
+                <input type="text" value={secForm.name} onChange={e=>setSecForm(p=>({...p,name:e.target.value}))} placeholder="Section name (e.g. Studies, Skincare...)"
+                  style={{flex:1,border:'1.5px solid #DDD6FE',borderRadius:14,padding:'11px 15px',fontSize:16,color:'#1E0A4A',background:'#F3EEFF'}}/>
+              </div>
+              <div>
+                <label style={{fontSize:15,fontWeight:900,color:'#5B21B6',display:'block',marginBottom:7}}>Description (optional)</label>
+                <input type="text" value={secForm.description} onChange={e=>setSecForm(p=>({...p,description:e.target.value}))} placeholder="What will you track in this section?"
+                  style={{width:'100%',border:'1.5px solid #DDD6FE',borderRadius:14,padding:'11px 15px',fontSize:15,color:'#1E0A4A',background:'#F3EEFF'}}/>
+              </div>
+              <div>
+                <label style={{fontSize:15,fontWeight:900,color:'#5B21B6',display:'block',marginBottom:8}}>Hero Flower</label>
+                <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+                  {flowerDecorOpts.map(({v,l})=>(
+                    <button key={v} onClick={()=>setSecForm(p=>({...p,flowerDecor:v}))} style={{padding:'9px 16px',borderRadius:12,border:`2px solid ${secForm.flowerDecor===v?'#A855F7':'#DDD6FE'}`,background:secForm.flowerDecor===v?'#EDE9FE':'white',cursor:'pointer',fontSize:15,fontWeight:800,color:secForm.flowerDecor===v?'#7C3AED':'#8B5CF6',transition:'all .2s'}}>{l}</button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label style={{fontSize:15,fontWeight:900,color:'#5B21B6',display:'block',marginBottom:8}}>Accent Color</label>
+                <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+                  {SEC_COLORS.map(c=>(
+                    <button key={c} onClick={()=>setSecForm(p=>({...p,color:c}))} style={{width:36,height:36,borderRadius:'50%',background:c,border:secForm.color===c?'3.5px solid #1E0A4A':'2.5px solid white',cursor:'pointer',boxShadow:'0 2px 6px rgba(0,0,0,.15)',transform:secForm.color===c?'scale(1.28)':'scale(1)',transition:'all .2s'}}/>
+                  ))}
+                </div>
+              </div>
+              <button onClick={addSection} style={{width:'100%',padding:'15px',background:'linear-gradient(135deg,#A855F7,#7C3AED)',border:'none',borderRadius:18,cursor:'pointer',fontFamily:'Nunito',fontWeight:900,fontSize:18,color:'white',boxShadow:'0 6px 20px rgba(168,85,247,.45)',marginTop:6}}>
+                Create Section 🌸
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{position:'fixed',bottom:0,left:0,right:0,height:60,background:'linear-gradient(to top,#EDE9FE,transparent)',pointerEvents:'none',zIndex:50}}/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
